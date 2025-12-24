@@ -1,16 +1,34 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { publicProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { notifyOwner } from "./_core/notification";
 import * as db from "./db";
+import { SignJWT, jwtVerify } from "jose";
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'barber-secret-key');
+
+// Create JWT token
+async function createToken(userId: number): Promise<string> {
+  return await new SignJWT({ userId })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setExpirationTime('30d')
+    .sign(JWT_SECRET);
+}
+
+// Protected procedure that requires phone auth
+const protectedProcedure = publicProcedure.use(async ({ ctx, next }) => {
+  if (!ctx.user) {
+    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'يجب تسجيل الدخول أولاً' });
+  }
+  return next({ ctx: { ...ctx, user: ctx.user } });
+});
 
 // Admin-only procedure
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
   if (ctx.user.role !== 'admin') {
-    throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+    throw new TRPCError({ code: 'FORBIDDEN', message: 'صلاحيات المدير مطلوبة' });
   }
   return next({ ctx });
 });
@@ -18,8 +36,64 @@ const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
 export const appRouter = router({
   system: systemRouter,
   
+  // Auth router with phone-based authentication
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
+    
+    // Login or register with phone number
+    loginWithPhone: publicProcedure
+      .input(z.object({
+        phone: z.string().min(8).max(20),
+        name: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Check if user exists
+        let user = await db.getUserByPhone(input.phone);
+        
+        if (!user) {
+          // Create new user
+          const result = await db.createUser(input.phone, input.name);
+          user = await db.getUserById(result.id);
+          if (!user) {
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'فشل في إنشاء الحساب' });
+          }
+        } else {
+          // Update last sign in
+          await db.updateUserLastSignIn(user.id);
+          if (input.name && !user.name) {
+            await db.updateUserName(user.id, input.name);
+          }
+        }
+        
+        // Create JWT token
+        const token = await createToken(user.id);
+        
+        // Set cookie
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, token, {
+          ...cookieOptions,
+          maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        });
+        
+        return { 
+          success: true, 
+          user: {
+            id: user.id,
+            phone: user.phone,
+            name: user.name,
+            role: user.role,
+          }
+        };
+      }),
+    
+    // Update user name
+    updateName: protectedProcedure
+      .input(z.object({ name: z.string().min(1) }))
+      .mutation(async ({ ctx, input }) => {
+        await db.updateUserName(ctx.user.id, input.name);
+        return { success: true };
+      }),
+    
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
@@ -34,7 +108,7 @@ export const appRouter = router({
     }),
     
     listAll: adminProcedure.query(async () => {
-      return await db.getAllServicesAdmin();
+      return await db.getAllServices(false);
     }),
     
     getById: publicProcedure
@@ -79,7 +153,19 @@ export const appRouter = router({
       }),
     
     seed: adminProcedure.mutation(async () => {
-      await db.seedDefaultServices();
+      // Seed default services
+      const services = [
+        { name: 'Haircut', nameAr: 'قص شعر', description: 'Professional haircut', durationMinutes: 30, price: 50 },
+        { name: 'Beard Trim', nameAr: 'تهذيب اللحية', description: 'Beard trimming and shaping', durationMinutes: 20, price: 30 },
+        { name: 'Hair & Beard', nameAr: 'شعر ولحية', description: 'Haircut with beard trim', durationMinutes: 45, price: 70 },
+        { name: 'Kids Haircut', nameAr: 'قص شعر أطفال', description: 'Haircut for children', durationMinutes: 25, price: 40 },
+        { name: 'Shave', nameAr: 'حلاقة', description: 'Traditional hot towel shave', durationMinutes: 30, price: 35 },
+      ];
+      
+      for (const service of services) {
+        await db.createService(service);
+      }
+      
       return { success: true };
     }),
   }),
@@ -141,7 +227,7 @@ export const appRouter = router({
         // Get service duration
         const service = await db.getServiceById(input.serviceId);
         if (!service) {
-          throw new TRPCError({ code: 'NOT_FOUND', message: 'Service not found' });
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'الخدمة غير موجودة' });
         }
         
         // Get existing appointments for this day
@@ -207,7 +293,7 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         const service = await db.getServiceById(input.serviceId);
         if (!service) {
-          throw new TRPCError({ code: 'NOT_FOUND', message: 'Service not found' });
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'الخدمة غير موجودة' });
         }
         
         const appointmentDate = new Date(input.appointmentDate);
@@ -216,7 +302,7 @@ export const appRouter = router({
         // Check availability
         const isAvailable = await db.checkTimeSlotAvailability(appointmentDate, endTime);
         if (!isAvailable) {
-          throw new TRPCError({ code: 'CONFLICT', message: 'This time slot is no longer available' });
+          throw new TRPCError({ code: 'CONFLICT', message: 'هذا الموعد لم يعد متاحاً' });
         }
         
         const result = await db.createAppointment({
@@ -225,15 +311,15 @@ export const appRouter = router({
           appointmentDate,
           endTime,
           customerName: input.customerName || ctx.user.name || undefined,
-          customerPhone: input.customerPhone,
+          customerPhone: input.customerPhone || ctx.user.phone,
           notes: input.notes,
           status: 'pending',
         });
         
         // Notify barber about new appointment
         await notifyOwner({
-          title: '📅 New Appointment Booking',
-          content: `New appointment booked!\n\nCustomer: ${input.customerName || ctx.user.name || 'Unknown'}\nService: ${service.name}\nDate: ${appointmentDate.toLocaleDateString()}\nTime: ${appointmentDate.toLocaleTimeString()}\n\nPlease review and confirm the appointment.`,
+          title: '📅 حجز موعد جديد',
+          content: `تم حجز موعد جديد!\n\nالعميل: ${input.customerName || ctx.user.name || 'غير معروف'}\nالخدمة: ${service.nameAr || service.name}\nالتاريخ: ${appointmentDate.toLocaleDateString('ar')}\nالوقت: ${appointmentDate.toLocaleTimeString('ar')}\n\nيرجى مراجعة وتأكيد الموعد.`,
         });
         
         return result;
@@ -270,11 +356,11 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         const appointment = await db.getAppointmentById(input.id);
         if (!appointment) {
-          throw new TRPCError({ code: 'NOT_FOUND', message: 'Appointment not found' });
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'الموعد غير موجود' });
         }
         
         if (appointment.userId !== ctx.user.id && ctx.user.role !== 'admin') {
-          throw new TRPCError({ code: 'FORBIDDEN', message: 'Not authorized' });
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'غير مصرح' });
         }
         
         await db.updateAppointmentStatus(input.id, 'cancelled');
@@ -328,6 +414,17 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         await db.updateAppointmentStatus(input.id, input.status);
+        return { success: true };
+      }),
+  }),
+  
+  // Admin management
+  admin: router({
+    // Make a user admin by phone
+    setAdmin: adminProcedure
+      .input(z.object({ phone: z.string() }))
+      .mutation(async ({ input }) => {
+        await db.setUserAsAdmin(input.phone);
         return { success: true };
       }),
   }),

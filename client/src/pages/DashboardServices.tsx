@@ -38,10 +38,10 @@ import {
 } from "@/components/ui/sheet";
 
 const navItems = [
-  { label: 'Overview', href: '/dashboard', icon: TrendingUp },
-  { label: 'Appointments', href: '/dashboard/appointments', icon: Calendar },
-  { label: 'Services', href: '/dashboard/services', icon: Scissors },
-  { label: 'Work Hours', href: '/dashboard/hours', icon: Clock },
+  { label: 'الرئيسية', href: '/dashboard', icon: TrendingUp },
+  { label: 'المواعيد', href: '/dashboard/appointments', icon: Calendar },
+  { label: 'الخدمات', href: '/dashboard/services', icon: Scissors },
+  { label: 'ساعات العمل', href: '/dashboard/hours', icon: Clock },
 ];
 
 function DashboardNav({ currentPath }: { currentPath: string }) {
@@ -100,49 +100,49 @@ export default function DashboardServices() {
 
   const createService = trpc.services.create.useMutation({
     onSuccess: () => {
-      toast.success('Service created successfully');
+      toast.success('تم إنشاء الخدمة بنجاح');
       utils.services.listAll.invalidate();
       utils.services.list.invalidate();
       setDialogOpen(false);
       resetForm();
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to create service');
+      toast.error(error.message || 'فشل في إنشاء الخدمة');
     }
   });
 
   const updateService = trpc.services.update.useMutation({
     onSuccess: () => {
-      toast.success('Service updated successfully');
+      toast.success('تم تحديث الخدمة بنجاح');
       utils.services.listAll.invalidate();
       utils.services.list.invalidate();
       setDialogOpen(false);
       resetForm();
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to update service');
+      toast.error(error.message || 'فشل في تحديث الخدمة');
     }
   });
 
   const deleteService = trpc.services.delete.useMutation({
     onSuccess: () => {
-      toast.success('Service deleted successfully');
+      toast.success('تم حذف الخدمة بنجاح');
       utils.services.listAll.invalidate();
       utils.services.list.invalidate();
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to delete service');
+      toast.error(error.message || 'فشل في حذف الخدمة');
     }
   });
 
   const seedServices = trpc.services.seed.useMutation({
     onSuccess: () => {
-      toast.success('Default services added');
+      toast.success('تمت إضافة الخدمات الافتراضية');
       utils.services.listAll.invalidate();
       utils.services.list.invalidate();
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to seed services');
+      toast.error(error.message || 'فشل في إضافة الخدمات');
     }
   });
 
@@ -171,7 +171,7 @@ export default function DashboardServices() {
 
   const handleSubmit = () => {
     if (!formData.name.trim()) {
-      toast.error('Service name is required');
+      toast.error('اسم الخدمة مطلوب');
       return;
     }
 
@@ -198,7 +198,7 @@ export default function DashboardServices() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" dir="rtl">
       {/* Header */}
       <header className="border-b border-border/50 bg-card/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container flex items-center justify-between h-16">
@@ -209,12 +209,12 @@ export default function DashboardServices() {
                   <Menu className="w-5 h-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-64 p-4">
+              <SheetContent side="right" className="w-64 p-4">
                 <div className="flex items-center gap-2 mb-6">
                   <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
                     <Scissors className="w-4 h-4 text-primary-foreground" />
                   </div>
-                  <span className="font-semibold">BarberBook</span>
+                  <span className="font-semibold">صالون الحلاقة</span>
                 </div>
                 <DashboardNav currentPath={location} />
               </SheetContent>
@@ -225,7 +225,7 @@ export default function DashboardServices() {
                 <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
                   <Scissors className="w-4 h-4 text-primary-foreground" />
                 </div>
-                <span className="font-semibold hidden sm:inline">BarberBook Admin</span>
+                <span className="font-semibold hidden sm:inline">لوحة التحكم</span>
               </div>
             </Link>
           </div>
@@ -234,17 +234,17 @@ export default function DashboardServices() {
             <Link href="/">
               <Button variant="ghost" size="sm" className="gap-2">
                 <Home className="w-4 h-4" />
-                <span className="hidden sm:inline">View Site</span>
+                <span className="hidden sm:inline">الموقع</span>
               </Button>
             </Link>
             <Button variant="ghost" size="sm" onClick={logout}>
-              Sign Out
+              تسجيل الخروج
             </Button>
           </div>
         </div>
       </header>
 
-      <div className="flex">
+      <div className="flex flex-row-reverse">
         {/* Sidebar - Desktop */}
         <aside className="hidden lg:block w-64 border-r min-h-[calc(100vh-4rem)] p-4 bg-card/50">
           <DashboardNav currentPath={location} />
@@ -255,8 +255,8 @@ export default function DashboardServices() {
           <div className="max-w-4xl mx-auto space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-bold">Services</h1>
-                <p className="text-muted-foreground">Manage your barbershop services</p>
+                <h1 className="text-2xl font-bold">الخدمات</h1>
+                <p className="text-muted-foreground">إدارة خدمات الصالون</p>
               </div>
               
               <div className="flex gap-2">
@@ -267,9 +267,9 @@ export default function DashboardServices() {
                     disabled={seedServices.isPending}
                   >
                     {seedServices.isPending ? (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      <Loader2 className="w-4 h-4 ml-2 animate-spin" />
                     ) : null}
-                    Add Default Services
+                    إضافة خدمات افتراضية
                   </Button>
                 )}
                 
@@ -280,57 +280,57 @@ export default function DashboardServices() {
                   <DialogTrigger asChild>
                     <Button className="gap-2">
                       <Plus className="w-4 h-4" />
-                      Add Service
+                      إضافة خدمة
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent dir="rtl">
                     <DialogHeader>
                       <DialogTitle>
-                        {editingService ? 'Edit Service' : 'Add New Service'}
+                        {editingService ? 'تعديل الخدمة' : 'إضافة خدمة جديدة'}
                       </DialogTitle>
                       <DialogDescription>
                         {editingService 
-                          ? 'Update the service details below' 
-                          : 'Fill in the details for the new service'}
+                          ? 'قم بتحديث تفاصيل الخدمة أدناه' 
+                          : 'أدخل تفاصيل الخدمة الجديدة'}
                       </DialogDescription>
                     </DialogHeader>
                     
                     <div className="space-y-4 py-4">
                       <div className="space-y-2">
-                        <Label htmlFor="name">Service Name *</Label>
+                        <Label htmlFor="name">اسم الخدمة (إنجليزي) *</Label>
                         <Input
                           id="name"
                           value={formData.name}
                           onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                          placeholder="e.g., Haircut"
+                          placeholder="مثال: Haircut"
+                          dir="ltr"
                         />
                       </div>
                       
                       <div className="space-y-2">
-                        <Label htmlFor="nameAr">Arabic Name</Label>
+                        <Label htmlFor="nameAr">اسم الخدمة (عربي)</Label>
                         <Input
                           id="nameAr"
                           value={formData.nameAr}
                           onChange={(e) => setFormData(prev => ({ ...prev, nameAr: e.target.value }))}
-                          placeholder="e.g., قص شعر"
-                          dir="rtl"
+                          placeholder="مثال: قص شعر"
                         />
                       </div>
                       
                       <div className="space-y-2">
-                        <Label htmlFor="description">Description</Label>
+                        <Label htmlFor="description">الوصف</Label>
                         <Textarea
                           id="description"
                           value={formData.description}
                           onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                          placeholder="Brief description of the service"
+                          placeholder="وصف مختصر للخدمة"
                           rows={3}
                         />
                       </div>
                       
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="duration">Duration (minutes)</Label>
+                          <Label htmlFor="duration">المدة (دقيقة)</Label>
                           <Input
                             id="duration"
                             type="number"
@@ -344,7 +344,7 @@ export default function DashboardServices() {
                         </div>
                         
                         <div className="space-y-2">
-                          <Label htmlFor="price">Price ($)</Label>
+                          <Label htmlFor="price">السعر (ر.س)</Label>
                           <Input
                             id="price"
                             type="number"
@@ -359,18 +359,18 @@ export default function DashboardServices() {
                       </div>
                     </div>
                     
-                    <DialogFooter>
+                    <DialogFooter className="flex-row-reverse gap-2">
                       <Button variant="outline" onClick={() => setDialogOpen(false)}>
-                        Cancel
+                        إلغاء
                       </Button>
                       <Button 
                         onClick={handleSubmit}
                         disabled={createService.isPending || updateService.isPending}
                       >
                         {(createService.isPending || updateService.isPending) ? (
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          <Loader2 className="w-4 h-4 ml-2 animate-spin" />
                         ) : null}
-                        {editingService ? 'Update' : 'Create'}
+                        {editingService ? 'تحديث' : 'إنشاء'}
                       </Button>
                     </DialogFooter>
                   </DialogContent>
@@ -386,9 +386,9 @@ export default function DashboardServices() {
               <Card>
                 <CardContent className="py-16 text-center">
                   <Scissors className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50" />
-                  <p className="text-muted-foreground mb-4">No services yet</p>
+                  <p className="text-muted-foreground mb-4">لا توجد خدمات بعد</p>
                   <Button onClick={() => seedServices.mutate()} disabled={seedServices.isPending}>
-                    Add Default Services
+                    إضافة خدمات افتراضية
                   </Button>
                 </CardContent>
               </Card>
@@ -404,20 +404,20 @@ export default function DashboardServices() {
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <h3 className="font-semibold">{service.name}</h3>
+                              <h3 className="font-semibold">{service.nameAr || service.name}</h3>
                               {!service.isActive && (
-                                <span className="text-xs bg-muted px-2 py-0.5 rounded">Inactive</span>
+                                <span className="text-xs bg-muted px-2 py-0.5 rounded">غير نشط</span>
                               )}
                             </div>
-                            {service.nameAr && (
-                              <p className="text-sm text-muted-foreground">{service.nameAr}</p>
+                            {service.nameAr && service.name && (
+                              <p className="text-sm text-muted-foreground">{service.name}</p>
                             )}
                             <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                               <span className="flex items-center gap-1">
                                 <Clock className="w-3 h-3" />
-                                {service.durationMinutes} min
+                                {service.durationMinutes} دقيقة
                               </span>
-                              <span className="font-semibold text-primary">${service.price}</span>
+                              <span className="font-semibold text-primary">{service.price} ر.س</span>
                             </div>
                           </div>
                         </div>
@@ -435,7 +435,7 @@ export default function DashboardServices() {
                             size="icon"
                             className="text-destructive hover:text-destructive"
                             onClick={() => {
-                              if (confirm('Are you sure you want to delete this service?')) {
+                              if (confirm('هل أنت متأكد من حذف هذه الخدمة؟')) {
                                 deleteService.mutate({ id: service.id });
                               }
                             }}
@@ -446,7 +446,7 @@ export default function DashboardServices() {
                         </div>
                       </div>
                       {service.description && (
-                        <p className="text-sm text-muted-foreground mt-3 ml-16">
+                        <p className="text-sm text-muted-foreground mt-3 mr-16">
                           {service.description}
                         </p>
                       )}

@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
 import { 
@@ -16,15 +15,16 @@ import {
   User,
   Check,
   Loader2,
-  ArrowLeft
+  ArrowRight,
+  Phone
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 
-                'July', 'August', 'September', 'October', 'November', 'December'];
+const DAYS_AR = ['أحد', 'إثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'];
+const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 
+                   'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 
 export default function Book() {
   const { user, isAuthenticated } = useAuth();
@@ -35,7 +35,7 @@ export default function Book() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [customerName, setCustomerName] = useState(user?.name || '');
-  const [customerPhone, setCustomerPhone] = useState('');
+  const [customerPhone, setCustomerPhone] = useState(user?.phone || '');
   const [notes, setNotes] = useState('');
   
   // Calendar state
@@ -55,11 +55,11 @@ export default function Book() {
   // Mutation
   const createAppointment = trpc.appointments.create.useMutation({
     onSuccess: () => {
-      toast.success('Appointment booked successfully!');
+      toast.success('تم حجز الموعد بنجاح!');
       navigate('/my-appointments');
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to book appointment');
+      toast.error(error.message || 'فشل في حجز الموعد');
     }
   });
 
@@ -104,7 +104,7 @@ export default function Book() {
 
   const handleSubmit = () => {
     if (!selectedService || !selectedDate || !selectedTime) {
-      toast.error('Please complete all required fields');
+      toast.error('يرجى إكمال جميع الحقول المطلوبة');
       return;
     }
 
@@ -123,23 +123,29 @@ export default function Book() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4" dir="rtl">
         <Card className="max-w-md w-full">
           <CardHeader className="text-center">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <User className="w-8 h-8 text-primary" />
             </div>
-            <CardTitle>Sign In Required</CardTitle>
+            <CardTitle>تسجيل الدخول مطلوب</CardTitle>
             <CardDescription>
-              Please sign in to book an appointment
+              يرجى تسجيل الدخول لحجز موعد
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <a href={getLoginUrl()} className="block">
+          <CardContent className="space-y-3">
+            <Link href="/login">
               <Button className="w-full" size="lg">
-                Sign In to Continue
+                تسجيل الدخول
               </Button>
-            </a>
+            </Link>
+            <Link href="/">
+              <Button variant="outline" className="w-full">
+                <ArrowRight className="w-4 h-4 ml-2" />
+                العودة للرئيسية
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>
@@ -147,17 +153,17 @@ export default function Book() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" dir="rtl">
       {/* Header */}
       <header className="border-b border-border/50 bg-card/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container flex items-center h-16">
           <Link href="/">
             <Button variant="ghost" size="sm" className="gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              Back
+              <ArrowRight className="w-4 h-4" />
+              العودة
             </Button>
           </Link>
-          <h1 className="text-lg font-semibold ml-4">Book Appointment</h1>
+          <h1 className="text-lg font-semibold mr-4">حجز موعد</h1>
         </div>
       </header>
 
@@ -166,9 +172,9 @@ export default function Book() {
           {/* Progress Steps */}
           <div className="flex items-center justify-center gap-4 mb-8">
             {[
-              { step: 1, label: 'Service', done: !!selectedService },
-              { step: 2, label: 'Date & Time', done: !!selectedDate && !!selectedTime },
-              { step: 3, label: 'Confirm', done: false },
+              { step: 1, label: 'الخدمة', done: !!selectedService },
+              { step: 2, label: 'التاريخ والوقت', done: !!selectedDate && !!selectedTime },
+              { step: 3, label: 'التأكيد', done: false },
             ].map((item, index) => (
               <div key={item.step} className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
@@ -200,7 +206,7 @@ export default function Book() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Scissors className="w-5 h-5" />
-                    Select Service
+                    اختر الخدمة
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -213,22 +219,19 @@ export default function Book() {
                           setSelectedTime(null);
                         }}
                         className={cn(
-                          "p-4 rounded-lg border-2 text-left transition-all",
+                          "p-4 rounded-lg border-2 text-right transition-all",
                           selectedService === service.id
                             ? "border-primary bg-primary/5"
                             : "border-border hover:border-primary/50"
                         )}
                       >
-                        <div className="font-medium">{service.name}</div>
-                        {service.nameAr && (
-                          <div className="text-sm text-muted-foreground">{service.nameAr}</div>
-                        )}
+                        <div className="font-medium">{service.nameAr || service.name}</div>
                         <div className="flex items-center justify-between mt-2 text-sm">
                           <span className="text-muted-foreground flex items-center gap-1">
                             <Clock className="w-3 h-3" />
-                            {service.durationMinutes} min
+                            {service.durationMinutes} دقيقة
                           </span>
-                          <span className="font-semibold text-primary">${service.price}</span>
+                          <span className="font-semibold text-primary">{service.price} ر.س</span>
                         </div>
                       </button>
                     ))}
@@ -242,7 +245,7 @@ export default function Book() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Calendar className="w-5 h-5" />
-                      Select Date
+                      اختر التاريخ
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -251,17 +254,17 @@ export default function Book() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
+                        onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </Button>
                       <span className="font-semibold">
-                        {MONTHS[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+                        {MONTHS_AR[currentMonth.getMonth()]} {currentMonth.getFullYear()}
                       </span>
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
+                        onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
                       >
                         <ChevronRight className="w-4 h-4" />
                       </Button>
@@ -269,7 +272,7 @@ export default function Book() {
 
                     {/* Calendar Grid */}
                     <div className="grid grid-cols-7 gap-1">
-                      {DAYS.map(day => (
+                      {DAYS_AR.map(day => (
                         <div key={day} className="text-center text-sm font-medium text-muted-foreground py-2">
                           {day}
                         </div>
@@ -315,10 +318,10 @@ export default function Book() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Clock className="w-5 h-5" />
-                      Select Time
+                      اختر الوقت
                     </CardTitle>
                     <CardDescription>
-                      {selectedDate.toLocaleDateString('en-US', { 
+                      {selectedDate.toLocaleDateString('ar-SA', { 
                         weekday: 'long', 
                         month: 'long', 
                         day: 'numeric' 
@@ -332,7 +335,7 @@ export default function Book() {
                       </div>
                     ) : !availableSlots?.isWorkingDay ? (
                       <p className="text-center text-muted-foreground py-8">
-                        This day is not a working day
+                        هذا اليوم عطلة
                       </p>
                     ) : (
                       <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
@@ -364,26 +367,26 @@ export default function Book() {
             <div className="space-y-6">
               <Card className="sticky top-24">
                 <CardHeader>
-                  <CardTitle>Booking Summary</CardTitle>
+                  <CardTitle>ملخص الحجز</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {selectedServiceData ? (
                     <div className="p-3 rounded-lg bg-muted/50">
-                      <div className="font-medium">{selectedServiceData.name}</div>
+                      <div className="font-medium">{selectedServiceData.nameAr || selectedServiceData.name}</div>
                       <div className="text-sm text-muted-foreground flex items-center justify-between mt-1">
-                        <span>{selectedServiceData.durationMinutes} minutes</span>
-                        <span className="font-semibold text-primary">${selectedServiceData.price}</span>
+                        <span>{selectedServiceData.durationMinutes} دقيقة</span>
+                        <span className="font-semibold text-primary">{selectedServiceData.price} ر.س</span>
                       </div>
                     </div>
                   ) : (
-                    <p className="text-sm text-muted-foreground">No service selected</p>
+                    <p className="text-sm text-muted-foreground">لم يتم اختيار خدمة</p>
                   )}
 
                   {selectedDate && (
                     <div className="p-3 rounded-lg bg-muted/50">
-                      <div className="text-sm text-muted-foreground">Date</div>
+                      <div className="text-sm text-muted-foreground">التاريخ</div>
                       <div className="font-medium">
-                        {selectedDate.toLocaleDateString('en-US', { 
+                        {selectedDate.toLocaleDateString('ar-SA', { 
                           weekday: 'short',
                           month: 'short', 
                           day: 'numeric',
@@ -395,57 +398,64 @@ export default function Book() {
 
                   {selectedTime && (
                     <div className="p-3 rounded-lg bg-muted/50">
-                      <div className="text-sm text-muted-foreground">Time</div>
+                      <div className="text-sm text-muted-foreground">الوقت</div>
                       <div className="font-medium">{selectedTime}</div>
                     </div>
                   )}
 
-                  <div className="border-t pt-4 space-y-4">
+                  <div className="border-t pt-4 space-y-3">
                     <div className="space-y-2">
-                      <Label htmlFor="name">Your Name</Label>
-                      <Input
-                        id="name"
-                        value={customerName}
-                        onChange={(e) => setCustomerName(e.target.value)}
-                        placeholder="Enter your name"
-                      />
+                      <Label htmlFor="name">الاسم</Label>
+                      <div className="relative">
+                        <User className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          id="name"
+                          value={customerName}
+                          onChange={(e) => setCustomerName(e.target.value)}
+                          placeholder="أدخل اسمك"
+                          className="pr-10"
+                        />
+                      </div>
                     </div>
-                    
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number</Label>
-                      <Input
-                        id="phone"
-                        value={customerPhone}
-                        onChange={(e) => setCustomerPhone(e.target.value)}
-                        placeholder="Enter your phone"
-                      />
+                      <Label htmlFor="phone">رقم الهاتف</Label>
+                      <div className="relative">
+                        <Phone className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          id="phone"
+                          value={customerPhone}
+                          onChange={(e) => setCustomerPhone(e.target.value)}
+                          placeholder="05xxxxxxxx"
+                          className="pr-10"
+                          dir="ltr"
+                        />
+                      </div>
                     </div>
-                    
                     <div className="space-y-2">
-                      <Label htmlFor="notes">Notes (Optional)</Label>
+                      <Label htmlFor="notes">ملاحظات (اختياري)</Label>
                       <Textarea
                         id="notes"
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
-                        placeholder="Any special requests?"
+                        placeholder="أي ملاحظات إضافية..."
                         rows={3}
                       />
                     </div>
                   </div>
 
-                  <Button
-                    className="w-full"
+                  <Button 
+                    className="w-full" 
                     size="lg"
                     disabled={!selectedService || !selectedDate || !selectedTime || createAppointment.isPending}
                     onClick={handleSubmit}
                   >
                     {createAppointment.isPending ? (
                       <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Booking...
+                        <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                        جاري الحجز...
                       </>
                     ) : (
-                      'Confirm Booking'
+                      'تأكيد الحجز'
                     )}
                   </Button>
                 </CardContent>

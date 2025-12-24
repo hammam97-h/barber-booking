@@ -19,3 +19,14 @@
 ## Testing
 - [x] Unit tests for booking procedures
 - [x] Unit tests for appointment management
+
+## New Requirements (Arabic + Phone Login)
+- [x] Update database schema for phone-based authentication
+- [x] Create phone login/register API endpoints
+- [x] Remove Manus OAuth dependency
+- [x] Translate Home page to Arabic
+- [x] Translate Book page to Arabic
+- [x] Translate MyAppointments page to Arabic
+- [x] Translate Dashboard pages to Arabic
+- [x] Add RTL support for Arabic layout
+- [x] Update tests for new auth system

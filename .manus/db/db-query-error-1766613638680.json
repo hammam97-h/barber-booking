@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE users DROP COLUMN IF EXISTS openId, DROP COLUMN IF EXISTS email, DROP COLUMN IF EXISTS loginMethod, ADD COLUMN IF NOT EXISTS phone varchar(20) UNIQUE;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user oL7i4k7anSCJzuX.e304d77efe72 --database aLJ63WFVXeqW8bn7bRFMgj --execute ALTER TABLE users DROP COLUMN IF EXISTS openId, DROP COLUMN IF EXISTS email, DROP COLUMN IF EXISTS loginMethod, ADD COLUMN IF NOT EXISTS phone varchar(20) UNIQUE;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 8200 (HY000) at line 1: unsupported add column 'phone' constraint UNIQUE KEY when altering 'aLJ63WFVXeqW8bn7bRFMgj.users'"
+  ]
+}

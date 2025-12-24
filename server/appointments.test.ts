@@ -284,7 +284,7 @@ describe("appointments router", () => {
 
     await expect(
       caller.appointments.updateStatus({ id: 1, status: "confirmed" })
-    ).rejects.toThrow("Admin access required");
+    ).rejects.toThrow("صلاحيات المدير مطلوبة");
   });
 
   it("user can cancel their own appointment", async () => {
@@ -320,6 +320,6 @@ describe("appointments router", () => {
 
     await expect(
       caller.appointments.cancel({ id: 1 })
-    ).rejects.toThrow("Not authorized");
+    ).rejects.toThrow("غير مصرح");
   });
 });

@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import DashboardAppointments from "./pages/DashboardAppointments";
 import DashboardServices from "./pages/DashboardServices";
 import DashboardHours from "./pages/DashboardHours";
+import Login from "./pages/Login";
 
 function Router() {
   return (
@@ -18,6 +19,7 @@ function Router() {
       {/* Public Routes */}
       <Route path="/" component={Home} />
       <Route path="/book" component={Book} />
+      <Route path="/login" component={Login} />
       <Route path="/my-appointments" component={MyAppointments} />
       
       {/* Admin Dashboard Routes */}

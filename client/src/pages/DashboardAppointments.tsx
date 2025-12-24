@@ -43,32 +43,32 @@ import {
 
 const statusConfig = {
   pending: { 
-    label: 'Pending', 
+    label: 'قيد الانتظار', 
     icon: AlertCircle, 
     className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' 
   },
   confirmed: { 
-    label: 'Confirmed', 
+    label: 'مؤكد', 
     icon: CheckCircle, 
     className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' 
   },
   cancelled: { 
-    label: 'Cancelled', 
+    label: 'ملغي', 
     icon: XCircle, 
     className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' 
   },
   completed: { 
-    label: 'Completed', 
+    label: 'مكتمل', 
     icon: CheckCircle, 
     className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' 
   },
 };
 
 const navItems = [
-  { label: 'Overview', href: '/dashboard', icon: TrendingUp },
-  { label: 'Appointments', href: '/dashboard/appointments', icon: Calendar },
-  { label: 'Services', href: '/dashboard/services', icon: Scissors },
-  { label: 'Work Hours', href: '/dashboard/hours', icon: Clock },
+  { label: 'الرئيسية', href: '/dashboard', icon: TrendingUp },
+  { label: 'المواعيد', href: '/dashboard/appointments', icon: Calendar },
+  { label: 'الخدمات', href: '/dashboard/services', icon: Scissors },
+  { label: 'ساعات العمل', href: '/dashboard/hours', icon: Clock },
 ];
 
 function DashboardNav({ currentPath }: { currentPath: string }) {
@@ -111,13 +111,13 @@ export default function DashboardAppointments() {
 
   const updateStatus = trpc.appointments.updateStatus.useMutation({
     onSuccess: () => {
-      toast.success('Appointment status updated');
+      toast.success('تم تحديث حالة الموعد');
       utils.appointments.listAll.invalidate();
       utils.appointments.pending.invalidate();
       utils.appointments.upcoming.invalidate();
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to update status');
+      toast.error(error.message || 'فشل في تحديث الحالة');
     }
   });
 
@@ -138,7 +138,7 @@ export default function DashboardAppointments() {
   ) || [];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" dir="rtl">
       {/* Header */}
       <header className="border-b border-border/50 bg-card/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container flex items-center justify-between h-16">
@@ -149,12 +149,12 @@ export default function DashboardAppointments() {
                   <Menu className="w-5 h-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-64 p-4">
+              <SheetContent side="right" className="w-64 p-4">
                 <div className="flex items-center gap-2 mb-6">
                   <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
                     <Scissors className="w-4 h-4 text-primary-foreground" />
                   </div>
-                  <span className="font-semibold">BarberBook</span>
+                  <span className="font-semibold">صالون الحلاقة</span>
                 </div>
                 <DashboardNav currentPath={location} />
               </SheetContent>
@@ -165,7 +165,7 @@ export default function DashboardAppointments() {
                 <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
                   <Scissors className="w-4 h-4 text-primary-foreground" />
                 </div>
-                <span className="font-semibold hidden sm:inline">BarberBook Admin</span>
+                <span className="font-semibold hidden sm:inline">لوحة التحكم</span>
               </div>
             </Link>
           </div>
@@ -174,17 +174,17 @@ export default function DashboardAppointments() {
             <Link href="/">
               <Button variant="ghost" size="sm" className="gap-2">
                 <Home className="w-4 h-4" />
-                <span className="hidden sm:inline">View Site</span>
+                <span className="hidden sm:inline">الموقع</span>
               </Button>
             </Link>
             <Button variant="ghost" size="sm" onClick={logout}>
-              Sign Out
+              تسجيل الخروج
             </Button>
           </div>
         </div>
       </header>
 
-      <div className="flex">
+      <div className="flex flex-row-reverse">
         {/* Sidebar - Desktop */}
         <aside className="hidden lg:block w-64 border-r min-h-[calc(100vh-4rem)] p-4 bg-card/50">
           <DashboardNav currentPath={location} />
@@ -195,20 +195,20 @@ export default function DashboardAppointments() {
           <div className="max-w-6xl mx-auto space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-bold">All Appointments</h1>
-                <p className="text-muted-foreground">Manage all customer appointments</p>
+                <h1 className="text-2xl font-bold">جميع المواعيد</h1>
+                <p className="text-muted-foreground">إدارة جميع مواعيد العملاء</p>
               </div>
               
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by status" />
+                  <SelectValue placeholder="تصفية حسب الحالة" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="confirmed">Confirmed</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                  <SelectItem value="all">جميع الحالات</SelectItem>
+                  <SelectItem value="pending">قيد الانتظار</SelectItem>
+                  <SelectItem value="confirmed">مؤكد</SelectItem>
+                  <SelectItem value="completed">مكتمل</SelectItem>
+                  <SelectItem value="cancelled">ملغي</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -222,24 +222,24 @@ export default function DashboardAppointments() {
                 ) : filteredAppointments.length === 0 ? (
                   <div className="text-center py-16 text-muted-foreground">
                     <Calendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>No appointments found</p>
+                    <p>لا توجد مواعيد</p>
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Customer</TableHead>
-                          <TableHead>Service</TableHead>
-                          <TableHead>Date & Time</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
+                          <TableHead>العميل</TableHead>
+                          <TableHead>الخدمة</TableHead>
+                          <TableHead>التاريخ والوقت</TableHead>
+                          <TableHead>الحالة</TableHead>
+                          <TableHead className="text-left">الإجراءات</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {filteredAppointments.map((appointment) => {
-                          const status = statusConfig[appointment.status];
-                          const StatusIcon = status.icon;
+                          const status = statusConfig[appointment.status as keyof typeof statusConfig];
+                          const StatusIcon = status?.icon || AlertCircle;
                           const appointmentDate = new Date(appointment.appointmentDate);
                           
                           return (
@@ -251,7 +251,7 @@ export default function DashboardAppointments() {
                                   </div>
                                   <div>
                                     <p className="font-medium">
-                                      {appointment.customerName || appointment.user?.name || 'Unknown'}
+                                      {appointment.customerName || appointment.user?.name || 'عميل'}
                                     </p>
                                     {appointment.customerPhone && (
                                       <p className="text-xs text-muted-foreground">
@@ -263,23 +263,23 @@ export default function DashboardAppointments() {
                               </TableCell>
                               <TableCell>
                                 <div>
-                                  <p className="font-medium">{appointment.service?.name}</p>
+                                  <p className="font-medium">{appointment.service?.nameAr || appointment.service?.name}</p>
                                   <p className="text-xs text-muted-foreground">
-                                    {appointment.service?.durationMinutes} min • ${appointment.service?.price}
+                                    {appointment.service?.durationMinutes} دقيقة • {appointment.service?.price} ر.س
                                   </p>
                                 </div>
                               </TableCell>
                               <TableCell>
                                 <div>
                                   <p className="font-medium">
-                                    {appointmentDate.toLocaleDateString('en-US', { 
+                                    {appointmentDate.toLocaleDateString('ar-SA', { 
                                       month: 'short', 
                                       day: 'numeric',
                                       year: 'numeric'
                                     })}
                                   </p>
                                   <p className="text-xs text-muted-foreground">
-                                    {appointmentDate.toLocaleTimeString('en-US', { 
+                                    {appointmentDate.toLocaleTimeString('ar-SA', { 
                                       hour: '2-digit', 
                                       minute: '2-digit' 
                                     })}
@@ -287,12 +287,12 @@ export default function DashboardAppointments() {
                                 </div>
                               </TableCell>
                               <TableCell>
-                                <Badge className={cn("gap-1", status.className)}>
+                                <Badge className={cn("gap-1", status?.className)}>
                                   <StatusIcon className="w-3 h-3" />
-                                  {status.label}
+                                  {status?.label}
                                 </Badge>
                               </TableCell>
-                              <TableCell className="text-right">
+                              <TableCell className="text-left">
                                 <Select
                                   value={appointment.status}
                                   onValueChange={(value) => 
@@ -307,10 +307,10 @@ export default function DashboardAppointments() {
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="pending">Pending</SelectItem>
-                                    <SelectItem value="confirmed">Confirmed</SelectItem>
-                                    <SelectItem value="completed">Completed</SelectItem>
-                                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                                    <SelectItem value="pending">قيد الانتظار</SelectItem>
+                                    <SelectItem value="confirmed">مؤكد</SelectItem>
+                                    <SelectItem value="completed">مكتمل</SelectItem>
+                                    <SelectItem value="cancelled">ملغي</SelectItem>
                                   </SelectContent>
                                 </Select>
                               </TableCell>

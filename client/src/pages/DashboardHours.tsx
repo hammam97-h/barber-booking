@@ -25,13 +25,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 
 const navItems = [
-  { label: 'Overview', href: '/dashboard', icon: TrendingUp },
-  { label: 'Appointments', href: '/dashboard/appointments', icon: Calendar },
-  { label: 'Services', href: '/dashboard/services', icon: Scissors },
-  { label: 'Work Hours', href: '/dashboard/hours', icon: Clock },
+  { label: 'الرئيسية', href: '/dashboard', icon: TrendingUp },
+  { label: 'المواعيد', href: '/dashboard/appointments', icon: Calendar },
+  { label: 'الخدمات', href: '/dashboard/services', icon: Scissors },
+  { label: 'ساعات العمل', href: '/dashboard/hours', icon: Clock },
 ];
 
 function DashboardNav({ currentPath }: { currentPath: string }) {
@@ -86,7 +86,7 @@ export default function DashboardHours() {
       utils.workHours.list.invalidate();
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to update work hours');
+      toast.error(error.message || 'فشل في تحديث ساعات العمل');
     }
   });
 
@@ -125,7 +125,7 @@ export default function DashboardHours() {
       for (const day of workHoursData) {
         await updateWorkHours.mutateAsync(day);
       }
-      toast.success('Work hours saved successfully');
+      toast.success('تم حفظ ساعات العمل بنجاح');
       setHasChanges(false);
     } catch (error) {
       // Error handled by mutation
@@ -145,7 +145,7 @@ export default function DashboardHours() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" dir="rtl">
       {/* Header */}
       <header className="border-b border-border/50 bg-card/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container flex items-center justify-between h-16">
@@ -156,12 +156,12 @@ export default function DashboardHours() {
                   <Menu className="w-5 h-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-64 p-4">
+              <SheetContent side="right" className="w-64 p-4">
                 <div className="flex items-center gap-2 mb-6">
                   <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
                     <Scissors className="w-4 h-4 text-primary-foreground" />
                   </div>
-                  <span className="font-semibold">BarberBook</span>
+                  <span className="font-semibold">صالون الحلاقة</span>
                 </div>
                 <DashboardNav currentPath={location} />
               </SheetContent>
@@ -172,7 +172,7 @@ export default function DashboardHours() {
                 <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
                   <Scissors className="w-4 h-4 text-primary-foreground" />
                 </div>
-                <span className="font-semibold hidden sm:inline">BarberBook Admin</span>
+                <span className="font-semibold hidden sm:inline">لوحة التحكم</span>
               </div>
             </Link>
           </div>
@@ -181,17 +181,17 @@ export default function DashboardHours() {
             <Link href="/">
               <Button variant="ghost" size="sm" className="gap-2">
                 <Home className="w-4 h-4" />
-                <span className="hidden sm:inline">View Site</span>
+                <span className="hidden sm:inline">الموقع</span>
               </Button>
             </Link>
             <Button variant="ghost" size="sm" onClick={logout}>
-              Sign Out
+              تسجيل الخروج
             </Button>
           </div>
         </div>
       </header>
 
-      <div className="flex">
+      <div className="flex flex-row-reverse">
         {/* Sidebar - Desktop */}
         <aside className="hidden lg:block w-64 border-r min-h-[calc(100vh-4rem)] p-4 bg-card/50">
           <DashboardNav currentPath={location} />
@@ -202,8 +202,8 @@ export default function DashboardHours() {
           <div className="max-w-3xl mx-auto space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-bold">Work Hours</h1>
-                <p className="text-muted-foreground">Set your working days and hours</p>
+                <h1 className="text-2xl font-bold">ساعات العمل</h1>
+                <p className="text-muted-foreground">حدد أيام وساعات العمل</p>
               </div>
               
               <Button 
@@ -216,7 +216,7 @@ export default function DashboardHours() {
                 ) : (
                   <Save className="w-4 h-4" />
                 )}
-                Save Changes
+                حفظ التغييرات
               </Button>
             </div>
 
@@ -227,9 +227,9 @@ export default function DashboardHours() {
             ) : (
               <Card>
                 <CardHeader>
-                  <CardTitle>Weekly Schedule</CardTitle>
+                  <CardTitle>الجدول الأسبوعي</CardTitle>
                   <CardDescription>
-                    Configure your working hours for each day of the week
+                    قم بتحديد ساعات العمل لكل يوم من أيام الأسبوع
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -242,7 +242,7 @@ export default function DashboardHours() {
                       )}
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                        <div className="flex items-center justify-between sm:w-40">
+                        <div className="flex items-center justify-between sm:w-32">
                           <span className="font-medium">{DAYS[index]}</span>
                           <Switch
                             checked={day.isWorkingDay}
@@ -254,7 +254,7 @@ export default function DashboardHours() {
                           <div className="flex flex-wrap items-center gap-4 flex-1">
                             <div className="flex items-center gap-2">
                               <Label htmlFor={`start-${index}`} className="text-sm text-muted-foreground whitespace-nowrap">
-                                From
+                                من
                               </Label>
                               <Input
                                 id={`start-${index}`}
@@ -267,7 +267,7 @@ export default function DashboardHours() {
                             
                             <div className="flex items-center gap-2">
                               <Label htmlFor={`end-${index}`} className="text-sm text-muted-foreground whitespace-nowrap">
-                                To
+                                إلى
                               </Label>
                               <Input
                                 id={`end-${index}`}
@@ -280,7 +280,7 @@ export default function DashboardHours() {
                             
                             <div className="flex items-center gap-2">
                               <Label htmlFor={`slot-${index}`} className="text-sm text-muted-foreground whitespace-nowrap">
-                                Slot
+                                الفترة
                               </Label>
                               <Input
                                 id={`slot-${index}`}
@@ -291,13 +291,13 @@ export default function DashboardHours() {
                                 onChange={(e) => handleChange(index, 'slotDurationMinutes', parseInt(e.target.value) || 30)}
                                 className="w-20"
                               />
-                              <span className="text-sm text-muted-foreground">min</span>
+                              <span className="text-sm text-muted-foreground">دقيقة</span>
                             </div>
                           </div>
                         )}
                         
                         {!day.isWorkingDay && (
-                          <span className="text-sm text-muted-foreground">Closed</span>
+                          <span className="text-sm text-muted-foreground">مغلق</span>
                         )}
                       </div>
                     </div>
@@ -308,13 +308,13 @@ export default function DashboardHours() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Tips</CardTitle>
+                <CardTitle>نصائح</CardTitle>
               </CardHeader>
               <CardContent className="text-sm text-muted-foreground space-y-2">
-                <p>• Toggle the switch to mark a day as working or closed.</p>
-                <p>• Set your start and end times for each working day.</p>
-                <p>• The slot duration determines how appointments are divided (e.g., 30 min slots).</p>
-                <p>• Changes will affect future bookings only.</p>
+                <p>• قم بتفعيل/إلغاء تفعيل المفتاح لتحديد يوم العمل أو الإغلاق.</p>
+                <p>• حدد وقت البداية والنهاية لكل يوم عمل.</p>
+                <p>• مدة الفترة تحدد كيفية تقسيم المواعيد (مثال: فترات 30 دقيقة).</p>
+                <p>• التغييرات ستؤثر على الحجوزات المستقبلية فقط.</p>
               </CardContent>
             </Card>
           </div>

@@ -16,7 +16,7 @@ import {
   CalendarDays,
   Loader2,
   Settings,
-  ArrowLeft,
+  ArrowRight,
   Menu,
   Home
 } from "lucide-react";
@@ -31,32 +31,32 @@ import {
 
 const statusConfig = {
   pending: { 
-    label: 'Pending', 
+    label: 'قيد الانتظار', 
     icon: AlertCircle, 
     className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' 
   },
   confirmed: { 
-    label: 'Confirmed', 
+    label: 'مؤكد', 
     icon: CheckCircle, 
     className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' 
   },
   cancelled: { 
-    label: 'Cancelled', 
+    label: 'ملغي', 
     icon: XCircle, 
     className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' 
   },
   completed: { 
-    label: 'Completed', 
+    label: 'مكتمل', 
     icon: CheckCircle, 
     className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' 
   },
 };
 
 const navItems = [
-  { label: 'Overview', href: '/dashboard', icon: TrendingUp },
-  { label: 'Appointments', href: '/dashboard/appointments', icon: Calendar },
-  { label: 'Services', href: '/dashboard/services', icon: Scissors },
-  { label: 'Work Hours', href: '/dashboard/hours', icon: Clock },
+  { label: 'الرئيسية', href: '/dashboard', icon: TrendingUp },
+  { label: 'المواعيد', href: '/dashboard/appointments', icon: Calendar },
+  { label: 'الخدمات', href: '/dashboard/services', icon: Scissors },
+  { label: 'ساعات العمل', href: '/dashboard/hours', icon: Clock },
 ];
 
 function DashboardNav({ currentPath }: { currentPath: string }) {
@@ -108,13 +108,13 @@ export default function Dashboard() {
 
   const updateStatus = trpc.appointments.updateStatus.useMutation({
     onSuccess: () => {
-      toast.success('Appointment status updated');
+      toast.success('تم تحديث حالة الموعد');
       utils.appointments.pending.invalidate();
       utils.appointments.upcoming.invalidate();
       utils.appointments.listAll.invalidate();
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to update status');
+      toast.error(error.message || 'فشل في تحديث الحالة');
     }
   });
 
@@ -142,7 +142,7 @@ export default function Dashboard() {
   const totalCompleted = allAppointments?.filter(apt => apt.status === 'completed').length || 0;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" dir="rtl">
       {/* Header */}
       <header className="border-b border-border/50 bg-card/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container flex items-center justify-between h-16">
@@ -153,12 +153,12 @@ export default function Dashboard() {
                   <Menu className="w-5 h-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-64 p-4">
+              <SheetContent side="right" className="w-64 p-4">
                 <div className="flex items-center gap-2 mb-6">
                   <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
                     <Scissors className="w-4 h-4 text-primary-foreground" />
                   </div>
-                  <span className="font-semibold">BarberBook</span>
+                  <span className="font-semibold">صالون الحلاقة</span>
                 </div>
                 <DashboardNav currentPath={location} />
               </SheetContent>
@@ -169,7 +169,7 @@ export default function Dashboard() {
                 <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
                   <Scissors className="w-4 h-4 text-primary-foreground" />
                 </div>
-                <span className="font-semibold hidden sm:inline">BarberBook Admin</span>
+                <span className="font-semibold hidden sm:inline">لوحة التحكم</span>
               </div>
             </Link>
           </div>
@@ -178,17 +178,17 @@ export default function Dashboard() {
             <Link href="/">
               <Button variant="ghost" size="sm" className="gap-2">
                 <Home className="w-4 h-4" />
-                <span className="hidden sm:inline">View Site</span>
+                <span className="hidden sm:inline">الموقع</span>
               </Button>
             </Link>
             <Button variant="ghost" size="sm" onClick={logout}>
-              Sign Out
+              تسجيل الخروج
             </Button>
           </div>
         </div>
       </header>
 
-      <div className="flex">
+      <div className="flex flex-row-reverse">
         {/* Sidebar - Desktop */}
         <aside className="hidden lg:block w-64 border-r min-h-[calc(100vh-4rem)] p-4 bg-card/50">
           <DashboardNav currentPath={location} />
@@ -198,8 +198,8 @@ export default function Dashboard() {
         <main className="flex-1 p-6">
           <div className="max-w-6xl mx-auto space-y-6">
             <div>
-              <h1 className="text-2xl font-bold">Dashboard Overview</h1>
-              <p className="text-muted-foreground">Welcome back! Here's what's happening today.</p>
+              <h1 className="text-2xl font-bold">نظرة عامة</h1>
+              <p className="text-muted-foreground">مرحباً! إليك ما يحدث اليوم.</p>
             </div>
 
             {/* Stats Cards */}
@@ -208,7 +208,7 @@ export default function Dashboard() {
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Today's Appointments</p>
+                      <p className="text-sm text-muted-foreground">مواعيد اليوم</p>
                       <p className="text-3xl font-bold">{todayAppointments.length}</p>
                     </div>
                     <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -222,7 +222,7 @@ export default function Dashboard() {
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Pending Approval</p>
+                      <p className="text-sm text-muted-foreground">قيد الانتظار</p>
                       <p className="text-3xl font-bold">{totalPending}</p>
                     </div>
                     <div className="w-12 h-12 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
@@ -236,7 +236,7 @@ export default function Dashboard() {
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Upcoming</p>
+                      <p className="text-sm text-muted-foreground">القادمة</p>
                       <p className="text-3xl font-bold">{totalUpcoming}</p>
                     </div>
                     <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
@@ -250,7 +250,7 @@ export default function Dashboard() {
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Completed</p>
+                      <p className="text-sm text-muted-foreground">مكتملة</p>
                       <p className="text-3xl font-bold">{totalCompleted}</p>
                     </div>
                     <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
@@ -266,10 +266,10 @@ export default function Dashboard() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <AlertCircle className="w-5 h-5 text-yellow-600" />
-                  Pending Appointments
+                  مواعيد قيد الانتظار
                 </CardTitle>
                 <CardDescription>
-                  Appointments waiting for your approval
+                  مواعيد تنتظر موافقتك
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -279,7 +279,7 @@ export default function Dashboard() {
                   </div>
                 ) : pendingAppointments?.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
-                    No pending appointments
+                    لا توجد مواعيد قيد الانتظار
                   </p>
                 ) : (
                   <div className="space-y-4">
@@ -297,24 +297,24 @@ export default function Dashboard() {
                             </div>
                             <div>
                               <p className="font-medium">
-                                {appointment.customerName || appointment.user?.name || 'Unknown'}
+                                {appointment.customerName || appointment.user?.name || 'عميل'}
                               </p>
                               <p className="text-sm text-muted-foreground">
-                                {appointment.service?.name} • {appointment.service?.durationMinutes} min
+                                {appointment.service?.nameAr || appointment.service?.name} • {appointment.service?.durationMinutes} دقيقة
                               </p>
                               <p className="text-sm text-muted-foreground">
-                                {appointmentDate.toLocaleDateString('en-US', { 
+                                {appointmentDate.toLocaleDateString('ar-SA', { 
                                   weekday: 'short',
                                   month: 'short', 
                                   day: 'numeric' 
-                                })} at {appointmentDate.toLocaleTimeString('en-US', { 
+                                })} الساعة {appointmentDate.toLocaleTimeString('ar-SA', { 
                                   hour: '2-digit', 
                                   minute: '2-digit' 
                                 })}
                               </p>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2 ml-16 sm:ml-0">
+                          <div className="flex items-center gap-2 mr-16 sm:mr-0">
                             <Button
                               size="sm"
                               variant="outline"
@@ -322,16 +322,16 @@ export default function Dashboard() {
                               onClick={() => updateStatus.mutate({ id: appointment.id, status: 'cancelled' })}
                               disabled={updateStatus.isPending}
                             >
-                              <XCircle className="w-4 h-4 mr-1" />
-                              Decline
+                              <XCircle className="w-4 h-4 ml-1" />
+                              رفض
                             </Button>
                             <Button
                               size="sm"
                               onClick={() => updateStatus.mutate({ id: appointment.id, status: 'confirmed' })}
                               disabled={updateStatus.isPending}
                             >
-                              <CheckCircle className="w-4 h-4 mr-1" />
-                              Confirm
+                              <CheckCircle className="w-4 h-4 ml-1" />
+                              قبول
                             </Button>
                           </div>
                         </div>
@@ -347,10 +347,10 @@ export default function Dashboard() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CalendarDays className="w-5 h-5 text-primary" />
-                  Today's Schedule
+                  جدول اليوم
                 </CardTitle>
                 <CardDescription>
-                  {new Date().toLocaleDateString('en-US', { 
+                  {new Date().toLocaleDateString('ar-SA', { 
                     weekday: 'long',
                     month: 'long', 
                     day: 'numeric',
@@ -361,13 +361,13 @@ export default function Dashboard() {
               <CardContent>
                 {todayAppointments.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
-                    No appointments scheduled for today
+                    لا توجد مواعيد مجدولة لليوم
                   </p>
                 ) : (
                   <div className="space-y-3">
                     {todayAppointments.map((appointment) => {
-                      const status = statusConfig[appointment.status];
-                      const StatusIcon = status.icon;
+                      const status = statusConfig[appointment.status as keyof typeof statusConfig];
+                      const StatusIcon = status?.icon || AlertCircle;
                       const appointmentDate = new Date(appointment.appointmentDate);
                       
                       return (
@@ -378,7 +378,7 @@ export default function Dashboard() {
                           <div className="flex items-center gap-3">
                             <div className="text-center min-w-[60px]">
                               <p className="text-lg font-semibold">
-                                {appointmentDate.toLocaleTimeString('en-US', { 
+                                {appointmentDate.toLocaleTimeString('ar-SA', { 
                                   hour: '2-digit', 
                                   minute: '2-digit' 
                                 })}
@@ -386,16 +386,16 @@ export default function Dashboard() {
                             </div>
                             <div>
                               <p className="font-medium">
-                                {appointment.customerName || appointment.user?.name || 'Unknown'}
+                                {appointment.customerName || appointment.user?.name || 'عميل'}
                               </p>
                               <p className="text-sm text-muted-foreground">
-                                {appointment.service?.name}
+                                {appointment.service?.nameAr || appointment.service?.name}
                               </p>
                             </div>
                           </div>
-                          <Badge className={cn("gap-1", status.className)}>
+                          <Badge className={cn("gap-1", status?.className)}>
                             <StatusIcon className="w-3 h-3" />
-                            {status.label}
+                            {status?.label}
                           </Badge>
                         </div>
                       );

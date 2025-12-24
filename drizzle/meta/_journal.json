@@ -15,6 +15,13 @@
       "when": 1766601842405,
       "tag": "0001_eminent_lady_deathstrike",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1766613558696,
+      "tag": "0002_many_nuke",
+      "breakpoints": true
     }
   ]
 }
