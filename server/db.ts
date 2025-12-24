@@ -43,9 +43,14 @@ export async function createUser(phone: string, name?: string): Promise<{ id: nu
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
+  // Check if this is the first user (will be admin)
+  const existingUsers = await db.select().from(users).limit(1);
+  const isFirstUser = existingUsers.length === 0;
+  
   const result = await db.insert(users).values({
     phone,
     name: name || null,
+    role: isFirstUser ? 'admin' : 'user',
     lastSignedIn: new Date(),
   });
   

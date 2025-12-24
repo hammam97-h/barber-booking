@@ -30,3 +30,8 @@
 - [x] Translate Dashboard pages to Arabic
 - [x] Add RTL support for Arabic layout
 - [x] Update tests for new auth system
+
+## Improvements (Admin Access)
+- [x] Verify first user becomes admin automatically
+- [x] Add dashboard link for admin users in header
+- [x] Show clear path for salon owner to access dashboard
