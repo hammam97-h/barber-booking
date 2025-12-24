@@ -24,7 +24,6 @@ export const services = mysqlTable("services", {
   name: varchar("name", { length: 100 }).notNull(),
   nameAr: varchar("nameAr", { length: 100 }),
   description: text("description"),
-  descriptionAr: text("descriptionAr"),
   durationMinutes: int("durationMinutes").notNull().default(30),
   price: int("price").notNull().default(0),
   isActive: boolean("isActive").notNull().default(true),

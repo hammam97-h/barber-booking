@@ -1,0 +1,21 @@
+{
+  "query": "SELECT * FROM services;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user oL7i4k7anSCJzuX.e304d77efe72 --database aLJ63WFVXeqW8bn7bRFMgj --execute SELECT * FROM services;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Haircut",
+      "nameAr": "قص شعر",
+      "description": "Professional haircut",
+      "durationMinutes": "30",
+      "price": "50",
+      "isActive": "1",
+      "createdAt": "2025-12-24 22:44:09",
+      "updatedAt": "2025-12-24 22:44:09"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tnameAr\tdescription\tdurationMinutes\tprice\tisActive\tcreatedAt\tupdatedAt\n1\tHaircut\tقص شعر\tProfessional haircut\t30\t50\t1\t2025-12-24 22:44:09\t2025-12-24 22:44:09\n",
+  "stderr": "",
+  "execution_time_ms": 105
+}

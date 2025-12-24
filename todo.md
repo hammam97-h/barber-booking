@@ -35,3 +35,6 @@
 - [x] Verify first user becomes admin automatically
 - [x] Add dashboard link for admin users in header
 - [x] Show clear path for salon owner to access dashboard
+
+## Bug Fixes
+- [x] Fix services insert query error (Fixed: removed descriptionAr column mismatch)

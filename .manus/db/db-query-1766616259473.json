@@ -1,0 +1,9 @@
+{
+  "query": "DELETE FROM services; INSERT INTO services (name, nameAr, description, durationMinutes, price, isActive, createdAt, updatedAt) VALUES ('Haircut', 'قص شعر', 'Professional haircut', 30, 50, true, NOW(), NOW()), ('Beard Trim', 'تهذيب اللحية', 'Beard trimming and shaping', 20, 30, true, NOW(), NOW()), ('Hair & Beard', 'شعر ولحية', 'Haircut with beard trim', 45, 70, true, NOW(), NOW()), ('Kids Haircut', 'قص شعر أطفال', 'Haircut for children', 25, 40, true, NOW(), NOW()), ('Shave', 'حلاقة', 'Traditional hot towel shave', 30, 35, true, NOW(), NOW());",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user oL7i4k7anSCJzuX.e304d77efe72 --database aLJ63WFVXeqW8bn7bRFMgj --execute DELETE FROM services; INSERT INTO services (name, nameAr, description, durationMinutes, price, isActive, createdAt, updatedAt) VALUES ('Haircut', 'قص شعر', 'Professional haircut', 30, 50, true, NOW(), NOW()), ('Beard Trim', 'تهذيب اللحية', 'Beard trimming and shaping', 20, 30, true, NOW(), NOW()), ('Hair & Beard', 'شعر ولحية', 'Haircut with beard trim', 45, 70, true, NOW(), NOW()), ('Kids Haircut', 'قص شعر أطفال', 'Haircut for children', 25, 40, true, NOW(), NOW()), ('Shave', 'حلاقة', 'Traditional hot towel shave', 30, 35, true, NOW(), NOW());",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 62
+}
