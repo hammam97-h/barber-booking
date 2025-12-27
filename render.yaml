@@ -14,6 +14,7 @@ services:
         value: production
       - key: MIGRATE_ON_START
         value: "1"
-      # Set these in Render UI (do not commit secrets):
-      # - DATABASE_URL
-      # - JWT_SECRET
+      # Add these environment variables in Render Dashboard:
+      # - DATABASE_URL: mysql://KMRLpkSJa8TfhDo.root:EQlxCzhB2nYIo0QC@gateway01.eu-central-1.prod.aws.tidbcloud.com:4000/test
+      # - JWT_SECRET: (generate a random long string)
+      # - VITE_APP_TITLE: نظام حجز مواعيد الحلاقة
