@@ -168,131 +168,6 @@ export default function DashboardHours() {
             </Sheet>
             
             <Link href="/">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                  <Scissors className="w-4 h-4 text-primary-foreground" />
-                </div>
-                <span className="font-semibold hidden sm:inline">لوحة التحكم</span>
-              </div>
-            </Link>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Link href="/">
-              <Button variant="ghost" size="sm" className="gap-2">
-                <Home className="w-4 h-4" />
-                <span className="hidden sm:inline">الموقع</span>
-              </Button>
-            </Link>
-            <Button variant="ghost" size="sm" onClick={logout}>
-              تسجيل الخروج
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      <div className="flex flex-row-reverse">
-        {/* Sidebar - Desktop */}
-        <aside className="hidden lg:block w-64 border-r min-h-[calc(100vh-4rem)] p-4 bg-card/50">
-          <DashboardNav currentPath={location} />
-        </aside>
-
-        {/* Main Content */}
-        <main className="flex-1 p-6">
-          <div className="max-w-3xl mx-auto space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-2xl font-bold">ساعات العمل</h1>
-                <p className="text-muted-foreground">حدد أيام وساعات العمل</p>
-              </div>
-              
-              <Button 
-                onClick={handleSave} 
-                disabled={!hasChanges || updateWorkHours.isPending}
-                className="gap-2"
-              >
-                {updateWorkHours.isPending ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Save className="w-4 h-4" />
-                )}
-                حفظ التغييرات
-              </Button>
-            </div>
-
-            {isLoading ? (
-              <div className="flex items-center justify-center py-16">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-              </div>
-            ) : (
-              <Card>
-                <CardHeader>
-                  <CardTitle>الجدول الأسبوعي</CardTitle>
-                  <CardDescription>
-                    قم بتحديد ساعات العمل لكل يوم من أيام الأسبوع
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {workHoursData.map((day, index) => (
-                    <div 
-                      key={index}
-                      className={cn(
-                        "p-4 rounded-lg border transition-colors",
-                        day.isWorkingDay ? "bg-card" : "bg-muted/50"
-                      )}
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                        <div className="flex items-center justify-between sm:w-32">
-                          <span className="font-medium">{DAYS[index]}</span>
-                          <Switch
-                            checked={day.isWorkingDay}
-                            onCheckedChange={(checked) => handleChange(index, 'isWorkingDay', checked)}
-                          />
-                        </div>
-                        
-                        {day.isWorkingDay && (
-                          <div className="flex flex-wrap items-center gap-4 flex-1">
-                            <div className="flex items-center gap-2">
-                              <Label htmlFor={`start-${index}`} className="text-sm text-muted-foreground whitespace-nowrap">
-                                من
-                              </Label>
-                              <Input
-                                id={`start-${index}`}
-                                type="time"
-                                value={day.startTime}
-                                onChange={(e) => handleChange(index, 'startTime', e.target.value)}
-                                className="w-32"
-                              />
-                            </div>
-                            
-                            <div className="flex items-center gap-2">
-                              <Label htmlFor={`end-${index}`} className="text-sm text-muted-foreground whitespace-nowrap">
-                                إلى
-                              </Label>
-                              <Input
-                                id={`end-${index}`}
-                                type="time"
-                                value={day.endTime}
-                                onChange={(e) => handleChange(index, 'endTime', e.target.value)}
-                                className="w-32"
-                              />
-                            </div>
-                            
-                            <div className="flex items-center gap-2">
-                              <Label htmlFor={`slot-${index}`} className="text-sm text-muted-foreground whitespace-nowrap">
-                                الفترة
-                              </Label>
-                              <Input
-                                id={`slot-${index}`}
-                                type="number"
-                                min={5}
-                                max={120}
-                                value={day.slotDurationMinutes}
-                                onChange={(e) => handleChange(index, 'slotDurationMinutes', parseInt(e.target.value) || 30)}
-                                className="w-20"
-                              />
-                              <span className="text-sm text-muted-foreground">دقيقة</span>
-                            </div>
                           </div>
                         )}
                         
@@ -313,7 +188,7 @@ export default function DashboardHours() {
               <CardContent className="text-sm text-muted-foreground space-y-2">
                 <p>• قم بتفعيل/إلغاء تفعيل المفتاح لتحديد يوم العمل أو الإغلاق.</p>
                 <p>• حدد وقت البداية والنهاية لكل يوم عمل.</p>
-                <p>• مدة الفترة تحدد كيفية تقسيم المواعيد (مثال: فترات 30 دقيقة).</p>
+                <p>• المستخدم يختار وقت البداية بحرّية داخل ساعات العمل، والنظام يمنع التداخل تلقائياً.</p>
                 <p>• التغييرات ستؤثر على الحجوزات المستقبلية فقط.</p>
               </CardContent>
             </Card>

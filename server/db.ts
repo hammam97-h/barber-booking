@@ -1,4 +1,4 @@
-import { eq, and, gte, lte, desc } from "drizzle-orm";
+import { eq, and, gte, lte, desc, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, users, 
@@ -218,19 +218,43 @@ export async function getAppointmentsByDateRange(startDate: Date, endDate: Date)
 export async function checkTimeSlotAvailability(date: Date, endTime: Date): Promise<boolean> {
   const db = await getDb();
   if (!db) return false;
-  
-  // Check if there's any overlapping appointment
+
+  // Check work hours for this day
+  const dayOfWeek = date.getDay();
+  const wh = await getWorkHoursByDay(dayOfWeek);
+  if (!wh || !wh.isWorkingDay) return false;
+
+  const parseToMinutes = (hhmm: string) => {
+    const [h, m] = hhmm.split(':').map(Number);
+    return (h || 0) * 60 + (m || 0);
+  };
+
+  const startMin = parseToMinutes(wh.startTime);
+  let endMin = parseToMinutes(wh.endTime);
+
+  // Treat "00:00" as end of day; also support overnight shifts (end <= start)
+  if (wh.endTime === "00:00") endMin = 24 * 60;
+  if (endMin <= startMin) endMin += 24 * 60;
+
+  const apptStartMin = date.getHours() * 60 + date.getMinutes();
+  const apptDurationMin = Math.ceil((endTime.getTime() - date.getTime()) / 60000);
+  const apptEndMin = apptStartMin + apptDurationMin;
+
+  // Must fit fully within working hours window
+  if (apptStartMin < startMin || apptEndMin > endMin) return false;
+
+  // Check if there's any overlapping appointment (pending/confirmed)
   const overlapping = await db.select()
     .from(appointments)
     .where(
       and(
         lte(appointments.appointmentDate, endTime),
         gte(appointments.endTime, date),
-        eq(appointments.status, 'confirmed')
+        inArray(appointments.status, ['pending', 'confirmed'])
       )
     )
     .limit(1);
-  
+
   return overlapping.length === 0;
 }
 

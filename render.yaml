@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: barber-booking
+    runtime: node
+    plan: free
+    buildCommand: |
+      corepack enable
+      pnpm install --frozen-lockfile
+      pnpm build
+    startCommand: pnpm start
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MIGRATE_ON_START
+        value: "1"
+      # Set these in Render UI (do not commit secrets):
+      # - DATABASE_URL
+      # - JWT_SECRET

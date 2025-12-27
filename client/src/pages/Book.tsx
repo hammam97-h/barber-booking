@@ -44,13 +44,8 @@ export default function Book() {
   // Queries
   const { data: services } = trpc.services.list.useQuery();
   const { data: workHours } = trpc.workHours.list.useQuery();
-  const { data: availableSlots, isLoading: slotsLoading } = trpc.appointments.getAvailableSlots.useQuery(
-    { 
-      date: selectedDate?.toISOString().split('T')[0] || '', 
-      serviceId: selectedService || 0 
-    },
-    { enabled: !!selectedDate && !!selectedService }
-  );
+
+  const selectedWorkHour = selectedDate ? workHours?.find(w => w.dayOfWeek === selectedDate.getDay()) : undefined;
   
   // Mutation
   const createAppointment = trpc.appointments.create.useMutation({
@@ -329,20 +324,29 @@ export default function Book() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    {slotsLoading ? (
-                      <div className="flex items-center justify-center py-8">
-                        <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                      </div>
-                    ) : !availableSlots?.isWorkingDay ? (
-                      <p className="text-center text-muted-foreground py-8">
-                        هذا اليوم عطلة
-                      </p>
-                    ) : (
-                      <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
-                        {availableSlots?.slots.map((slot) => (
-                          <button
-                            key={slot.time}
-                            onClick={() => slot.available && setSelectedTime(slot.time)}
+                    {!selectedWorkHour?.isWorkingDay ? (
+  <p className="text-center text-muted-foreground py-8">
+    هذا اليوم عطلة
+  </p>
+) : (
+  <div className="space-y-4">
+    <div className="flex flex-col gap-2">
+      <Label htmlFor="time">اختر وقت البداية</Label>
+      <Input
+        id="time"
+        type="time"
+        step={300}
+        value={selectedTime ?? ""}
+        min={selectedWorkHour?.startTime}
+        max={selectedWorkHour?.endTime === "00:00" ? "23:59" : selectedWorkHour?.endTime}
+        onChange={(e) => setSelectedTime(e.target.value)}
+      />
+      <p className="text-sm text-muted-foreground">
+        اختر أي وقت يناسبك داخل ساعات العمل، وسيتم حجز المدة حسب زمن الخدمة تلقائياً.
+      </p>
+    </div>
+  </div>
+)}
                             disabled={!slot.available}
                             className={cn(
                               "py-2 px-3 rounded-lg text-sm font-medium transition-all",
